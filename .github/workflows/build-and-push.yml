@@ -1,0 +1,167 @@
+name: Build and Push to Docker Hub
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Dockerfile.agent'
+      - 'recipe_creator/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.version'
+      - '.github/workflows/build-and-push.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: para5
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Read version
+        id: version
+        run: |
+          if [ -f ".version" ]; then
+            VERSION=$(cat .version | tr -d '\n')
+          else
+            # Fallback to pyproject.toml version
+            VERSION=$(grep '^version = ' pyproject.toml | sed "s/version = \"\(.*\)\"/\1/" | tr -d '\n')
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod a+x /usr/local/bin/yq
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.agent
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            para5/recipe-creator:latest
+            para5/recipe-creator:${{ steps.version.outputs.version }}
+            para5/recipe-creator:build-${{ github.run_number }}
+            para5/recipe-creator:${{ github.sha }}
+          cache-from: type=registry,ref=para5/recipe-creator:buildcache
+          cache-to: type=registry,ref=para5/recipe-creator:buildcache,mode=max
+
+      - name: Prepare Bindu registration data
+        id: prepare_data
+        run: |
+          # Read agent config
+          AGENT_CONFIG=$(cat recipe_creator/agent_config.json)
+
+          # Read all skills from the skills folder
+          SKILLS_ARRAY="[]"
+          if [ -d "recipe_creator/skills/" ]; then
+            for skill_dir in recipe_creator/skills/*/; do
+              if [ -d "$skill_dir" ] && [ -f "${skill_dir}skill.yaml" ]; then
+                echo "Reading skill from: ${skill_dir}skill.yaml"
+                SKILL_JSON=$(yq -o=json "${skill_dir}skill.yaml")
+                SKILLS_ARRAY=$(echo "$SKILLS_ARRAY" | jq --argjson skill "$SKILL_JSON" '. += [$skill]')
+              fi
+            done
+          else
+            echo "No skills directory found at recipe_creator/skills/"
+          fi
+
+          # Get version
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Create the complete registration payload using jq for proper JSON construction
+          REGISTRATION_PAYLOAD=$(jq -n \
+            --argjson agent_config "$AGENT_CONFIG" \
+            --argjson skills "$SKILLS_ARRAY" \
+            --arg version "$VERSION" \
+            --arg docker_image "para5/recipe-creator:latest" \
+            --arg docker_digest "${{ steps.docker_build.outputs.digest }}" \
+            --arg repo_url "https://github.com/${{ github.repository }}" \
+            --arg commit_sha "${{ github.sha }}" \
+            --arg build_number "${{ github.run_number }}" \
+            --arg last_updated "${{ github.event.head_commit.timestamp }}" \
+            '{
+              "agent": {
+                "name": $agent_config.name,
+                "author": $agent_config.author,
+                "description": $agent_config.description,
+                "version": $version,
+                "agent_trust": $agent_config.agent_trust,
+                "type": "culinary"
+              },
+              "skills": $skills,
+              "framework": {
+                "name": "agno",
+                "version": "1.0.0"
+              },
+              "environment_variables": $agent_config.environment_variables,
+              "execution_cost": {},
+              "auth": {},
+              "deployment": {
+                "url": $agent_config.deployment.url,
+                "protocol_version": $agent_config.deployment.protocol_version,
+                "docker_image": $docker_image,
+                "docker_digest": $docker_digest,
+                "platforms": ["linux/amd64", "linux/arm64"]
+              },
+              "repository": {
+                "url": $repo_url,
+                "commit_sha": $commit_sha,
+                "build_number": $build_number
+              },
+              "metadata": {
+                "documentation_url": "https://Paraschamoli.github.io/recipe-creator/",
+                "domain": "culinary",
+                "specialization": "recipe-creation",
+                "last_updated": $last_updated
+              }
+            }')
+
+          # Save the payload to a file for debugging and for the next step
+          echo "$REGISTRATION_PAYLOAD" > registration_payload.json
+          echo "payload=$(echo "$REGISTRATION_PAYLOAD" | jq -c .)" >> $GITHUB_OUTPUT
+
+          echo "Generated registration payload:"
+          cat registration_payload.json | jq .
+
+      - name: Register with Bindu
+        run: |
+          echo "Sending registration to Bindu..."
+          
+          # Check if BINDU_API_TOKEN is set
+          if [ -z "${{ secrets.BINDU_API_TOKEN }}" ]; then
+            echo "⚠️  BINDU_API_TOKEN not set, skipping registration"
+            echo "Note: Set BINDU_API_TOKEN secret to enable automatic agent registration"
+            exit 0
+          fi
+
+          curl --location 'https://bindus.getbindu.com/bindu-register' \
+            --header 'accept: application/json' \
+            --header 'X-Bindu-CI: true' \
+            --header "X-API-Token: ${{ secrets.BINDU_API_TOKEN }}" \
+            --header 'Content-Type: application/json' \
+            --data-binary @registration_payload.json
+
+          echo ""
+          echo "✅ Registration complete"

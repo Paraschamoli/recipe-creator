@@ -1,0 +1,21 @@
+# |---------------------------------------------------------|
+# |                                                         |
+# |                 Give Feedback / Get Help                |
+# | https://github.com/getbindu/Bindu/issues/new/choose    |
+# |                                                         |
+# |---------------------------------------------------------|
+#
+#  Thank you users! We ❤️ you! - 🌻
+
+"""recipe-creator - A Bindu Agent for intelligent recipe creation."""
+
+from recipe_creator.__version__ import __version__
+from recipe_creator.main import cleanup, handler, initialize_agent, main
+
+__all__ = [
+    "__version__",
+    "cleanup",
+    "handler",
+    "initialize_agent",
+    "main",
+]

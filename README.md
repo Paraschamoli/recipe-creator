@@ -2,344 +2,464 @@
   <img src="https://raw.githubusercontent.com/getbindu/create-bindu-agent/refs/heads/main/assets/light.svg" alt="bindu Logo" width="200">
 </p>
 
-<h1 align="center">recipe-creator</h1>
+<h1 align="center">Recipe Creator Agent</h1>
+<h3 align="center">AI-Powered Culinary Assistant</h3>
 
 <p align="center">
-  <strong>Recipe Creator Agent is an AI-powered culinary assistant that generates personalized recipes based on available ingredients, dietary preferences, cuisine choices, and skill level. It can suggest creative meal ideas, provide step-by-step cooking instructions, offer substitutions, and adjust recipes for health goals—helping users cook smarter, faster, and more creatively.</strong>
+  <strong>Generate personalized recipes, plan meals, and master cooking with AI guidance</strong><br/>
+  Transform ingredients into delicious meals with dietary-aware recipe creation
 </p>
 
 <p align="center">
-  <a href="https://github.com/Paraschamoli/recipe-creator/actions/workflows/main.yml?query=branch%3Amain">
-    <img src="https://img.shields.io/github/actions/workflow/status/Paraschamoli/recipe-creator/main.yml?branch=main" alt="Build status">
+  <a href="https://github.com/Paraschamoli/recipe-creator/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/Paraschamoli/recipe-creator/build-and-push.yml?branch=main" alt="Build Status">
   </a>
-  <a href="https://img.shields.io/github/license/Paraschamoli/recipe-creator">
+  <img src="https://img.shields.io/badge/python-3.12+-blue.svg" alt="Python Version">
+  <a href="https://github.com/Paraschamoli/recipe-creator/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/Paraschamoli/recipe-creator" alt="License">
   </a>
 </p>
 
 ---
 
-## 📖 Overview
+## 🎯 What is Recipe Creator Agent?
 
-Recipe Creator Agent is an AI-powered culinary assistant that generates personalized recipes based on available ingredients, dietary preferences, cuisine choices, and skill level. It can suggest creative meal ideas, provide step-by-step cooking instructions, offer substitutions, and adjust recipes for health goals—helping users cook smarter, faster, and more creatively.. Built on the [Bindu Agent Framework](https://github.com/getbindu/bindu) for the Internet of Agents.
+An AI-powered culinary assistant that generates personalized recipes based on available ingredients, dietary preferences, cuisine choices, and skill level. It suggests creative meal ideas, provides step-by-step cooking instructions, offers substitutions, and adjusts recipes for health goals—helping users cook smarter, faster, and more creatively.
 
-**Key Capabilities:**
-- 🔍 [Add your key capabilities here]
-- ✅ [Add another capability]
-- 🚨 [Add another capability]
+### Key Features
+*   **🍳 Personalized Recipe Generation** - Create recipes from available ingredients
+*   **🥗 Dietary Adaptation** - Adjust for vegetarian, vegan, gluten-free, keto, and more
+*   **⏱️ Time-Optimized Meals** - Recipes tailored to your time constraints
+*   **📋 Meal Planning** - Weekly meal plans and shopping lists
+*   **🧠 Cooking Guidance** - Step-by-step instructions and techniques
+*   **⚡ Lazy Initialization** - Fast boot times, initializes on first request
+*   **🔐 Secure API Handling** - No API keys required at startup
+
+---
+
+## 🛠️ Tools & Capabilities
+
+### Core Technologies
+*   **ExaTools** - Recipe search and ingredient lookup
+*   **Mem0 AI Memory** - Remember user preferences and dietary restrictions
+*   **OpenRouter LLM** - Culinary knowledge and recipe generation
+*   **Dietary Awareness** - Adapt recipes for specific dietary needs
+
+### Recipe Creation Process
+1.  **Ingredient Analysis** - Understand available ingredients and constraints
+2.  **Recipe Search** - Find matching recipes from culinary databases
+3.  **Personalization** - Adapt recipes to dietary preferences and skill level
+4.  **Detailed Instructions** - Provide clear, step-by-step cooking guidance
+5.  **Nutritional Information** - Include estimated nutritional values
+6.  **Meal Planning** - Create comprehensive meal plans and shopping lists
+
+---
+
+> **🌐 Join the Internet of Agents**
+> Register your agent at [bindus.directory](https://bindus.directory) to make it discoverable worldwide and enable agent-to-agent collaboration. It takes 2 minutes and unlocks the full potential of your agent.
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Python 3.10+
-- [uv](https://github.com/astral-sh/uv) package manager
-- API keys for OpenRouter and Mem0 (both have free tiers)
-
-### Installation
+### 1. Clone and Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/Paraschamoli/recipe-creator.git
 cd recipe-creator
 
-# Create virtual environment
-uv venv --python 3.12.9
+# Set up virtual environment with uv
+uv venv --python 3.12
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
 uv sync
+```
 
-# Configure environment
+### 2. Configure Environment
+
+```bash
+# Copy environment template
 cp .env.example .env
+
+# Edit .env and add your API keys:
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+EXA_API_KEY=your_exa_api_key_here
+MEM0_API_KEY=your_mem0_api_key_here
 ```
 
-### Configuration
-
-Edit `.env` and add your API keys:
-
-| Key | Get It From | Required |
-|-----|-------------|----------|
-| `OPENROUTER_API_KEY` | [OpenRouter](https://openrouter.ai/keys) | ✅ Yes |
-| `MEM0_API_KEY` | [Mem0 Dashboard](https://app.mem0.ai/dashboard/api-keys) | If you want to use Mem0 tools |
-
-### Run the Agent
+### 3. Run Locally
 
 ```bash
-# Start the agent
+# Start the recipe creator agent
+python -m recipe_creator
+
+# Or using uv
 uv run python -m recipe_creator
-
-# Agent will be available at http://localhost:3773
 ```
 
-### Github Setup
-
-```bash
-# Initialize git repository and commit your code
-git init -b main
-git add .
-git commit -m "Initial commit"
-
-# Create repository on GitHub and push (replace with your GitHub username)
-gh repo create Paraschamoli/recipe-creator --public --source=. --remote=origin --push
-```
-
----
-
-## 💡 Usage
-
-### Example Queries
-
-```bash
-# Example query 1
-"[Add example query here]"
-
-# Example query 2
-"[Add another example]"
-```
-
-### Input Formats
-
-**Plain Text:**
-```
-[Describe expected input format]
-```
-
-**JSON:**
-```json
-{
-  "content": "[example content]",
-  "focus": "[example focus]"
-}
-```
-
-### Output Structure
-
-The agent returns structured output with:
-- **[Output Component 1]**: Description
-- **[Output Component 2]**: Description
-- **[Output Component 3]**: Description
-
----
-
-## 🔌 API Usage
-
-The agent exposes a RESTful API when running. Default endpoint: `http://localhost:3773` 
-
-### Quick Start
-
-For complete API documentation, request/response formats, and examples, visit:
-
-📚 **[Bindu API Reference - Send Message to Agent](https://docs.getbindu.com/api-reference/all-the-tasks/send-message-to-agent)**
-
-
-### Additional Resources
-
-- 📖 [Full API Documentation](https://docs.getbindu.com/api-reference/all-the-tasks/send-message-to-agent)
-- 📦 [Postman Collections](https://github.com/GetBindu/Bindu/tree/main/postman/collections)
-- 🔧 [API Reference](https://docs.getbindu.com)
-
----
-
-## 🎯 Skills
-
-### recipe_creator (v1.0.0)
-
-**Primary Capability:**
-- [Describe what this skill does]
-- [Add key features]
-
-**Features:**
-- [Feature 1]
-- [Feature 2]
-- [Feature 3]
-
-**Best Used For:**
-- [Use case 1]
-- [Use case 2]
-- [Use case 3]
-
-**Not Suitable For:**
-- [Anti-pattern 1]
-- [Anti-pattern 2]
-
-**Performance:**
-- Average processing time: ~[X] seconds
-- Max concurrent requests: [N]
-- Memory per request: [X]MB
-
----
-
-## 🐳 Docker Deployment
-
-### Local Docker Setup
+### 4. Test with Docker
 
 ```bash
 # Build and run with Docker Compose
 docker-compose up --build
 
-# Agent will be available at http://localhost:3773
-```
-
-### Docker Configuration
-
-The agent runs on port `3773` and requires:
-- `OPENROUTER_API_KEY` environment variable
-- `MEM0_API_KEY` environment variable
-
-Configure these in your `.env` file before running.
-
-### Production Deployment
-
-```bash
-# Use production compose file
-docker-compose -f docker-compose.prod.yml up -d
+# Access at: http://localhost:3773
 ```
 
 ---
 
-## 🌐 Deploy to bindus.directory
+## 🔧 Configuration
 
-Make your agent discoverable worldwide and enable agent-to-agent collaboration.
+### Environment Variables
+Create a `.env` file:
 
-### Setup GitHub Secrets
+```env
+# Required API Keys
+OPENROUTER_API_KEY=your_openrouter_api_key_here  # Get from: https://openrouter.ai/keys
+EXA_API_KEY=your_exa_api_key_here                # Get from: https://exa.ai
+MEM0_API_KEY=your_mem0_api_key_here              # Get from: https://app.mem0.ai/dashboard/api-keys
 
-```bash
-# Authenticate with GitHub
-gh auth login
-
-# Set deployment secrets
-gh secret set BINDU_API_TOKEN --body "<your-bindu-api-key>"
-gh secret set DOCKERHUB_TOKEN --body "<your-dockerhub-token>"
+# Optional
+MODEL_NAME=openai/gpt-4o                         # OpenRouter model ID
+DEBUG=true                                       # Enable debug logging
 ```
 
-Get your keys:
-- **Bindu API Key**: [bindus.directory](https://bindus.directory) dashboard
-- **Docker Hub Token**: [Docker Hub Security Settings](https://hub.docker.com/settings/security)
-
-### Deploy
-
-```bash
-# Push to trigger automatic deployment
-git push origin main
-```
-
-GitHub Actions will automatically:
-1. Build your agent
-2. Create Docker container
-3. Push to Docker Hub
-4. Register on bindus.directory
+### Port Configuration
+Default port: `3773` (can be changed in `agent_config.json`)
 
 ---
 
-## 🛠️ Development
+## 💡 Usage Examples
 
-### Project Structure
+### Via HTTP API
 
+```bash
+curl -X POST http://localhost:3773/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [
+      {
+        "role": "user",
+        "content": "I have chicken breast, broccoli, garlic, and rice. Need a healthy dinner recipe that takes less than 45 minutes and is gluten-free."
+      }
+    ]
+  }'
 ```
+
+### Sample Recipe Queries
+
+```text
+"Create a vegetarian pasta recipe with mushrooms and spinach for 2 people, ready in 30 minutes"
+
+"Suggest healthy breakfast options with oats and fruits that are vegan and high in protein"
+
+"What can I make with leftover turkey and potatoes? Looking for something creative for 4 servings"
+
+"Need a quick dessert recipe using chocolate and bananas, suitable for kids and ready in 20 minutes"
+
+"Give me a gluten-free dinner recipe using salmon and asparagus, with nutritional information"
+
+"Plan a weekly meal prep for keto diet with shopping list and calorie counts"
+```
+
+### Expected Output Format
+
+```markdown
+# {Recipe Title} 🍽️
+
+## Basic Information
+- **Cuisine Type:** {Cuisine}
+- **Preparation Time:** {Prep time} minutes
+- **Cooking Time:** {Cook time} minutes
+- **Total Time:** {Total time} minutes
+- **Difficulty:** {Beginner/Intermediate/Advanced}
+- **Servings:** {Number of servings}
+- **Dietary Tags:** 🌱 Vegetarian / 🌿 Vegan / 🌾 Gluten-free / 🥜 Contains nuts / ⏱️ Quick
+
+## Ingredients
+### Main Ingredients
+- {Ingredient 1} - {Quantity}
+- {Ingredient 2} - {Quantity}
+- {Ingredient 3} - {Quantity}
+
+### Seasonings & Sauces
+- {Seasoning 1} - {Quantity}
+- {Seasoning 2} - {Quantity}
+
+## Instructions
+1. {Step 1 - detailed instruction}
+2. {Step 2 - detailed instruction}
+3. {Step 3 - detailed instruction}
+4. {Step 4 - detailed instruction}
+
+## Nutritional Information (per serving)
+- **Calories:** {Number}
+- **Protein:** {Number}g
+- **Carbohydrates:** {Number}g
+- **Fat:** {Number}g
+- **Fiber:** {Number}g
+
+## Tips & Variations
+- **Substitutions:** {Ingredient substitution options}
+- **Time-saving tips:** {Make-ahead suggestions}
+- **Common mistakes:** {What to avoid}
+- **Variations:** {Different ways to prepare}
+
+## Pairing Suggestions
+- **Side dishes:** {Recommended sides}
+- **Wine pairing:** {Wine suggestions if appropriate}
+- **Presentation:** {Plating tips}
+
+## Storage & Leftovers
+- **Refrigerator:** {Storage duration}
+- **Freezer:** {Freezing instructions}
+- **Reheating:** {Best reheating methods}
+
+---
+Recipe created by ChefGenius AI
+Bon Appétit! 🍴
+Date: {current_date}
+```
+
+---
+
+## 🐳 Docker Deployment
+
+### Quick Docker Setup
+
+```bash
+# Build the image
+docker build -t recipe-creator -f Dockerfile.agent .
+
+# Run container
+docker run -d \
+  -p 3773:3773 \
+  -e OPENROUTER_API_KEY=your_key_here \
+  -e EXA_API_KEY=your_exa_key_here \
+  -e MEM0_API_KEY=your_mem0_key_here \
+  --name recipe-creator \
+  recipe-creator
+
+# Check logs
+docker logs -f recipe-creator
+```
+
+### Docker Compose (Recommended)
+
+`docker-compose.yml`:
+
+```yaml
+version: '3.8'
+services:
+  recipe-creator:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    ports:
+      - "3773:3773"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - EXA_API_KEY=${EXA_API_KEY}
+      - MEM0_API_KEY=${MEM0_API_KEY}
+    restart: unless-stopped
+```
+
+Run with Compose:
+
+```bash
+# Start with compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+```
+
+---
+
+## 📁 Project Structure
+
+```text
 recipe-creator/
 ├── recipe_creator/
-│   ├── skills/
-│   │   └── recipe_creator/
-│   │       ├── skill.yaml          # Skill configuration
-│   │       └── __init__.py
-│   ├── __init__.py
-│   ├── __main__.py
-│   ├── main.py                     # Agent entry point
-│   └── agent_config.json           # Agent configuration
-├── tests/
-│   └── test_main.py
-├── .env.example
-├── docker-compose.yml
-├── Dockerfile.agent
-└── pyproject.toml
+│   ├── __init__.py              # Package initialization
+│   ├── main.py                  # Main agent implementation
+│   ├── agent_config.json        # Agent configuration
+│   └── skills/
+│       └── recipe-creator/
+│           └── skill.yaml       # Skill definition
+├── pyproject.toml               # Python dependencies
+├── Dockerfile.agent             # Docker build file
+├── docker-compose.yml           # Docker Compose setup
+├── README.md                    # This documentation
+├── .env.example                 # Environment template
+└── tests/                       # Test files
+    └── test_main.py
 ```
 
-### Running Tests
+---
+
+## 🔌 API Reference
+
+### Health Check
 
 ```bash
-make test              # Run all tests
-make test-cov          # With coverage report
+GET http://localhost:3773/health
 ```
 
-### Code Quality
+Response:
+```json
+{"status": "healthy", "agent": "Recipe Creator Agent"}
+```
+
+### Chat Endpoint
 
 ```bash
-make format            # Format code with ruff
-make lint              # Run linters
-make check             # Format + lint + test
+POST http://localhost:3773/chat
+Content-Type: application/json
+
+{
+  "messages": [
+    {"role": "user", "content": "Your recipe request here"}
+  ]
+}
 ```
 
-### Pre-commit Hooks
+For complete API documentation, visit: [Bindu API Reference](https://docs.getbindu.com)
+
+---
+
+## 🧪 Testing
+
+### Local Testing
 
 ```bash
-# Install pre-commit hooks
-uv run pre-commit install
+# Install test dependencies
+uv sync --group dev
 
-# Run manually
-uv run pre-commit run -a
+# Run tests
+pytest tests/
+
+# Test with specific API keys
+OPENROUTER_API_KEY=test_key EXA_API_KEY=test_key MEM0_API_KEY=test_key python -m pytest
 ```
+
+### Integration Test
+
+```bash
+# Start agent
+python -m recipe_creator &
+
+# Test API endpoint
+curl -X POST http://localhost:3773/chat \
+  -H "Content-Type: application/json" \
+  -d '{"messages": [{"role": "user", "content": "I have eggs, bread, and cheese. Breakfast ideas?"}]}'
+```
+
+---
+
+## 🚨 Troubleshooting
+
+### Common Issues & Solutions
+
+**"ModuleNotFoundError"**
+```bash
+uv sync --force
+```
+
+**"Port 3773 already in use"**
+Change port in `agent_config.json` or kill the process:
+```bash
+lsof -ti:3773 | xargs kill -9
+```
+
+**"No API key provided"**
+Check if `.env` exists and variable names match. Or set directly:
+```bash
+export OPENROUTER_API_KEY=your_key
+export EXA_API_KEY=your_exa_key
+export MEM0_API_KEY=your_mem0_key
+```
+
+**Docker build fails**
+```bash
+docker system prune -a
+docker-compose build --no-cache
+```
+
+**"Exa API key required"**
+Get a key from Exa.ai for recipe search functionality
+
+**"No recipes found for ingredients"**
+Try broader ingredient categories or remove some constraints
+
+---
+
+## 📊 Dependencies
+
+### Core Packages
+*   **bindu** - Agent deployment framework
+*   **agno** - AI agent framework
+*   **exa-py** - Recipe search and ingredient lookup
+*   **mem0ai** - Memory operations
+*   **openai** - OpenAI client for embeddings
+*   **python-dotenv** - Environment management
+
+### Development Packages
+*   **pytest** - Testing framework
+*   **ruff** - Code formatting/linting
+*   **pre-commit** - Git hooks
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
+We welcome contributions! Please follow these steps:
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature` 
-3. Commit your changes: `git commit -m 'Add amazing feature'` 
-4. Push to the branch: `git push origin feature/amazing-feature` 
-5. Open a Pull Request
+1.  Fork the repository
+2.  Create a feature branch: `git checkout -b feature/improvement`
+3.  Make your changes following the code style
+4.  Add tests for new functionality
+5.  Commit with descriptive messages
+6.  Push to your fork
+7.  Open a Pull Request
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+**Code Style:**
+*   Follow PEP 8 conventions
+*   Use type hints where possible
+*   Add docstrings for public functions
+*   Keep functions focused and small
 
 ---
 
 ## 📄 License
+MIT License - see [LICENSE](LICENSE) file for details.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 🙏 Credits & Acknowledgments
+*   **Developer:** Paras Chamoli
+*   **Framework:** Bindu - Agent deployment platform
+*   **Agent Framework:** Agno - AI agent toolkit
+*   **Recipe Search:** Exa.ai for culinary database access
+*   **Memory System:** Mem0 AI
 
----
+## 🔗 Useful Links
+*   🌐 **Bindu Directory:** [bindus.directory](https://bindus.directory)
+*   📚 **Bindu Docs:** [docs.getbindu.com](https://docs.getbindu.com)
+*   🐙 **GitHub:** [github.com/Paraschamoli/recipe-creator](https://github.com/Paraschamoli/recipe-creator)
+*   💬 **Discord:** Bindu Community
 
-## 🙏 Powered by Bindu
-
-Built with the [Bindu Agent Framework](https://github.com/getbindu/bindu)
-
-**Why Bindu?**
-- 🌐 **Internet of Agents**: A2A, AP2, X402 protocols for agent collaboration
-- ⚡ **Zero-config setup**: From idea to production in minutes
-- 🛠️ **Production-ready**: Built-in deployment, monitoring, and scaling
-
-**Build Your Own Agent:**
-```bash
-uvx cookiecutter https://github.com/getbindu/create-bindu-agent.git
-```
-
----
-
-## 📚 Resources
-
-- 📖 [Full Documentation](https://Paraschamoli.github.io/recipe-creator/)
-- 💻 [GitHub Repository](https://github.com/Paraschamoli/recipe-creator/)
-- 🐛 [Report Issues](https://github.com/Paraschamoli/recipe-creator/issues)
-- 💬 [Join Discord](https://discord.gg/3w5zuYUuwt)
-- 🌐 [Agent Directory](https://bindus.directory)
-- 📚 [Bindu Documentation](https://docs.getbindu.com)
-
----
+<br>
 
 <p align="center">
-  <strong>Built with 💛 by the team from Amsterdam 🌷</strong>
+  <strong>Built with ❤️ by Paras Chamoli</strong><br/>
+  <em>Making cooking accessible and enjoyable through AI</em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Paraschamoli/recipe-creator">⭐ Star this repo</a> •
-  <a href="https://discord.gg/3w5zuYUuwt">💬 Join Discord</a> •
-  <a href="https://bindus.directory">🌐 Agent Directory</a>
+  <a href="https://github.com/Paraschamoli/recipe-creator/stargazers">⭐ Star on GitHub</a> •
+  <a href="https://bindus.directory">🌐 Register on Bindu</a> •
+  <a href="https://github.com/Paraschamoli/recipe-creator/issues">🐛 Report Issues</a>
 </p>
 
-#   r e c i p e - c r e a t o r  
- 
+> **Note:** This agent follows the Bindu pattern with lazy initialization and secure API key handling. It boots without API keys and only fails at runtime if keys are needed but not provided.

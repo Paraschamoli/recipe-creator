@@ -1,0 +1,52 @@
+site_name: recipe-creator
+repo_url: https://github.com/Paraschamoli/recipe-creator
+site_url: https://Paraschamoli.github.io/recipe-creator
+site_description: Recipe Creator Agent is an AI-powered culinary assistant that generates personalized recipes based on available ingredients, dietary preferences, cuisine choices, and skill level. It can suggest creative meal ideas, provide step-by-step cooking instructions, offer substitutions, and adjust recipes for health goals—helping users cook smarter, faster, and more creatively.
+site_author: Paras Chamoli
+edit_uri: edit/main/docs/
+repo_name: Paraschamoli/recipe-creator
+copyright: Maintained by <a href="https://Paraschamoli.com">Paraschamoli</a>.
+
+nav:
+  - Home: index.md
+  - Modules: modules.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["src/recipe_creator"]
+theme:
+  name: material
+  feature:
+    tabs: true
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Paraschamoli/recipe-creator
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/recipe-creator
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true

@@ -1,0 +1,27 @@
+services:
+  recipe_creator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: recipe_creator
+    ports:
+      - "3773:3773"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      
+
+    env_file:
+      - .env
+    volumes:
+      - ./recipe_creator:/app/recipe_creator
+      - ./agent_config.json:/app/agent_config.json
+    restart: unless-stopped
+    networks:
+      - recipe_creator-network
+    
+
+networks:
+  recipe_creator-network:
+    driver: bridge
+
+
