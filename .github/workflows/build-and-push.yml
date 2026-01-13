@@ -148,7 +148,7 @@ jobs:
       - name: Register with Bindu
         run: |
           echo "Sending registration to Bindu..."
-          
+
           # Check if BINDU_API_TOKEN is set
           if [ -z "${{ secrets.BINDU_API_TOKEN }}" ]; then
             echo "⚠️  BINDU_API_TOKEN not set, skipping registration"

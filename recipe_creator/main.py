@@ -87,10 +87,7 @@ async def initialize_agent() -> None:
         raise ValueError(error_msg)
 
     if not exa_api_key:
-        error_msg = (
-            "No Exa API key provided. Set EXA_API_KEY environment variable.\n"
-            "Get your key from: https://exa.ai"
-        )
+        error_msg = "No Exa API key provided. Set EXA_API_KEY environment variable.\nGet your key from: https://exa.ai"
         raise ValueError(error_msg)
 
     if not mem0_api_key:

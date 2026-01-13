@@ -1,45 +1,49 @@
 {
-    "author": "paras25619@gmail.com",
-    "name": "recipe-creator",
-    "description": "Recipe Creator Agent is an AI-powered culinary assistant that generates personalized recipes based on available ingredients, dietary preferences, cuisine choices, and skill level. It can suggest creative meal ideas, provide step-by-step cooking instructions, offer substitutions, and adjust recipes for health goals—helping users cook smarter, faster, and more creatively.",
-    "version": "1.0.0",
-    "recreate_keys": false,
-    "skills": [
-        "skills/recipe-creator"
+  "author": "paras25619@gmail.com",
+  "name": "recipe-creator",
+  "description": "Recipe Creator Agent is an AI-powered culinary assistant that generates personalized recipes based on available ingredients, dietary preferences, cuisine choices, and skill level. It can suggest creative meal ideas, provide step-by-step cooking instructions, offer substitutions, and adjust recipes for health goals\u2014helping users cook smarter, faster, and more creatively.",
+  "version": "1.0.0",
+  "recreate_keys": false,
+  "skills": [
+    "skills/recipe-creator"
+  ],
+  "capabilities": {},
+  "agent_trust": "low",
+  "debug_mode": true,
+  "debug_level": 2,
+  "deployment": {
+    "url": "http://0.0.0.0:3773",
+    "expose": true,
+    "protocol_version": "1.0.0",
+    "proxy_urls": [
+      "0.0.0.0"
     ],
-    "capabilities": {},
-    "agent_trust": "low",
-    "debug_mode": true,
-    "debug_level": 2,
-    "deployment": {
-        "url": "http://0.0.0.0:3773",
-        "expose": true,
-        "protocol_version": "1.0.0",
-        "proxy_urls": ["0.0.0.0"],
-        "cors_origins": ["*"]
-    },
-    "storage": {
-        "type": "memory"
-    },
-    "scheduler": {
-        "type": "memory"
-    },
-    "num_history_sessions": 5,
-    "environment_variables": [
-        {
-            "key": "OPENROUTER_API_KEY",
-            "description": "OpenRouter API key for LLM calls",
-            "required": true
-        },
-        {
-            "key": "EXA_API_KEY",
-            "description": "Exa API key for recipe search and lookup",
-            "required": true
-        },
-        {
-            "key": "MEM0_API_KEY",
-            "description": "Mem0 API key for memory operations",
-            "required": true
-        }
+    "cors_origins": [
+      "*"
     ]
+  },
+  "storage": {
+    "type": "memory"
+  },
+  "scheduler": {
+    "type": "memory"
+  },
+  "num_history_sessions": 5,
+  "environment_variables": [
+    {
+      "key": "OPENROUTER_API_KEY",
+      "description": "OpenRouter API key for LLM calls",
+      "required": true
+    },
+    {
+      "key": "EXA_API_KEY",
+      "description": "Exa API key for recipe search and lookup",
+      "required": true
+    },
+    {
+      "key": "MEM0_API_KEY",
+      "description": "Mem0 API key for memory operations",
+      "required": true
+    }
+  ]
 }
