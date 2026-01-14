@@ -131,7 +131,7 @@ jobs:
                 "build_number": $build_number
               },
               "metadata": {
-                "documentation_url": "https://Paraschamoli.github.io/recipe-creator/",
+                "documentation_url": "https://github.com/Paraschamoli/recipe-creator#readme",
                 "domain": "culinary",
                 "specialization": "recipe-creation",
                 "last_updated": $last_updated
