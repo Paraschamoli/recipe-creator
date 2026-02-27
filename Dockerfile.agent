@@ -31,7 +31,7 @@ FROM raahulrahl/bindu-runtime-base:latest
 # OCI labels
 LABEL org.opencontainers.image.title="recipe-creator"
 LABEL org.opencontainers.image.description="Recipe Creator Agent is an AI-powered culinary assistant that generates personalized recipes based on available ingredients, dietary preferences, cuisine choices, and skill level. It can suggest creative meal ideas, provide step-by-step cooking instructions, offer substitutions, and adjust recipes for health goals—helping users cook smarter, faster, and more creatively."
-LABEL org.opencontainers.image.authors="Paras Chamoli <paras25619@gmail.com>"
+LABEL org.opencontainers.image.authors="Paras Chamoli <paras@getbindu.com>"
 LABEL org.opencontainers.image.version="1.0.0"
 LABEL org.opencontainers.image.source="https://github.com/Paraschamoli/recipe-creator"
 LABEL org.opencontainers.image.licenses="MIT"
