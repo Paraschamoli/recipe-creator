@@ -35,21 +35,7 @@ jobs:
       - name: Read version
         id: version
         run: |
-          if [ -f ".version" ]; then
-            VERSION=$(cat .version | tr -d '\n')
-          else
-            # Fallback to pyproject.toml version
-            VERSION=$(grep '^version = ' pyproject.toml | sed "s/version = \"\(.*\)\"/\1/" | tr -d '\n')
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-          sudo chmod a+x /usr/local/bin/yq
+          echo "version=$(cat .version | tr -d '\n')" >> $GITHUB_OUTPUT
 
       - name: Build and push
         id: docker_build
@@ -67,101 +53,158 @@ jobs:
           cache-from: type=registry,ref=para5/recipe-creator:buildcache
           cache-to: type=registry,ref=para5/recipe-creator:buildcache,mode=max
 
-      - name: Prepare Bindu registration data
-        id: prepare_data
+      - name: Read agent config
+        id: agent_config
         run: |
-          # Read agent config
-          AGENT_CONFIG=$(cat recipe_creator/agent_config.json)
+          echo "config=$(cat recipe_creator/agent_config.json | jq -c .)" >> $GITHUB_OUTPUT
+          echo "version=$(cat .version | tr -d '\n')" >> $GITHUB_OUTPUT
 
           # Read all skills from the skills folder
-          SKILLS_ARRAY="[]"
-          if [ -d "recipe_creator/skills/" ]; then
-            for skill_dir in recipe_creator/skills/*/; do
-              if [ -d "$skill_dir" ] && [ -f "${skill_dir}skill.yaml" ]; then
-                echo "Reading skill from: ${skill_dir}skill.yaml"
-                SKILL_JSON=$(yq -o=json "${skill_dir}skill.yaml")
-                SKILLS_ARRAY=$(echo "$SKILLS_ARRAY" | jq --argjson skill "$SKILL_JSON" '. += [$skill]')
-              fi
-            done
-          else
-            echo "No skills directory found at recipe_creator/skills/"
-          fi
+          skills_array="[]"
+          for skill_dir in recipe_creator/skills/*/; do
+            if [ -f "${skill_dir}skill.yaml" ]; then
+              skill_json=$(cat "${skill_dir}skill.yaml" | yq -o=json | jq -c .)
+              skills_array=$(echo "$skills_array" | jq --argjson skill "$skill_json" '. += [$skill]')
+            fi
+          done
+          echo "skills=$(echo $skills_array | jq -c .)" >> $GITHUB_OUTPUT
 
-          # Get version
-          VERSION="${{ steps.version.outputs.version }}"
-
-          # Create the complete registration payload using jq for proper JSON construction
-          REGISTRATION_PAYLOAD=$(jq -n \
-            --argjson agent_config "$AGENT_CONFIG" \
-            --argjson skills "$SKILLS_ARRAY" \
-            --arg version "$VERSION" \
-            --arg docker_image "para5/recipe-creator:latest" \
-            --arg docker_digest "${{ steps.docker_build.outputs.digest }}" \
-            --arg repo_url "https://github.com/${{ github.repository }}" \
-            --arg commit_sha "${{ github.sha }}" \
-            --arg build_number "${{ github.run_number }}" \
-            --arg last_updated "${{ github.event.head_commit.timestamp }}" \
-            '{
-              "agent": {
-                "name": $agent_config.name,
-                "author": $agent_config.author,
-                "description": $agent_config.description,
-                "version": $version,
-                "agent_trust": $agent_config.agent_trust,
-                "type": "culinary"
-              },
-              "skills": $skills,
-              "framework": {
-                "name": "agno",
-                "version": "1.0.0"
-              },
-              "environment_variables": $agent_config.environment_variables,
-              "execution_cost": {},
-              "auth": {},
-              "deployment": {
-                "url": $agent_config.deployment.url,
-                "protocol_version": $agent_config.deployment.protocol_version,
-                "docker_image": $docker_image,
-                "docker_digest": $docker_digest,
-                "platforms": ["linux/amd64", "linux/arm64"]
-              },
-              "repository": {
-                "url": $repo_url,
-                "commit_sha": $commit_sha,
-                "build_number": $build_number
-              },
-              "metadata": {
-                "documentation_url": "https://github.com/Paraschamoli/recipe-creator#readme",
-                "domain": "culinary",
-                "specialization": "recipe-creation",
-                "last_updated": $last_updated
-              }
-            }')
-
-          # Save the payload to a file for debugging and for the next step
-          echo "$REGISTRATION_PAYLOAD" > registration_payload.json
-          echo "payload=$(echo "$REGISTRATION_PAYLOAD" | jq -c .)" >> $GITHUB_OUTPUT
-
-          echo "Generated registration payload:"
-          cat registration_payload.json | jq .
-
-      - name: Register with Bindu
+      - name: Register agent deployment
+        id: register
         run: |
-          echo "Sending registration to Bindu..."
+          # Create JSON payload file to avoid shell escaping issues
+          cat > /tmp/payload.json <<'EOF'
+          {
+            "agent": {
+              "name": "${{ fromJson(steps.agent_config.outputs.config).name }}",
+              "author": "${{ fromJson(steps.agent_config.outputs.config).author }}",
+              "description": "${{ fromJson(steps.agent_config.outputs.config).description }}",
+              "version": "${{ steps.agent_config.outputs.version }}",
+              "agent_trust": "${{ fromJson(steps.agent_config.outputs.config).agent_trust }}",
+              "type": "culinary"
+            },
+            "skills": ${{ toJson(fromJson(steps.agent_config.outputs.skills)) }},
+            "framework": {
+              "name": "agno",
+              "version": "1.0.0"
+            },
+            "environment_variables": ${{ toJson(fromJson(steps.agent_config.outputs.config).environment_variables) }},
+            "execution_cost": ${{ toJson(fromJson(steps.agent_config.outputs.config).execution_cost || fromJson('{}')) }},
+            "auth": ${{ toJson(fromJson(steps.agent_config.outputs.config).auth || fromJson('{}')) }},
+            "deployment": {
+              "url": "${{ fromJson(steps.agent_config.outputs.config).deployment.url }}",
+              "protocol_version": "${{ fromJson(steps.agent_config.outputs.config).deployment.protocol_version }}",
+              "docker_image": "para5/recipe-creator:latest",
+              "docker_digest": "${{ steps.docker_build.outputs.digest }}",
+              "platforms": ["linux/amd64", "linux/arm64"]
+            },
+            "repository": {
+              "url": "https://github.com/${{ github.repository }}",
+              "commit_sha": "${{ github.sha }}",
+              "build_number": "${{ github.run_number }}"
+            },
+            "metadata": {
+              "documentation_url": "https://github.com/Paraschamoli/recipe-creator#readme",
+              "domain": "${{ fromJson(steps.agent_config.outputs.config).metadata.domain || 'culinary' }}",
+              "specialization": "${{ fromJson(steps.agent_config.outputs.config).metadata.specialization || 'recipe-creation' }}",
+              "last_updated": "${{ github.event.head_commit.timestamp }}"
+            }
+          }
+          EOF
 
-          # Check if BINDU_API_TOKEN is set
-          if [ -z "${{ secrets.BINDU_API_TOKEN }}" ]; then
-            echo "⚠️  BINDU_API_TOKEN not set, skipping registration"
-            echo "Note: Set BINDU_API_TOKEN secret to enable automatic agent registration"
-            exit 0
-          fi
-
-          curl --location 'https://bindus.getbindu.com/bindu-register' \
+          response=$(curl -w "\n%{http_code}" --location 'https://bindus.getbindu.com/bindu-register' \
             --header 'accept: application/json' \
             --header 'X-Bindu-CI: true' \
-            --header "X-API-Token: ${{ secrets.BINDU_API_TOKEN }}" \
+            --header 'X-API-Token: ${{ secrets.BINDU_API_TOKEN }}' \
             --header 'Content-Type: application/json' \
-            --data-binary @registration_payload.json
+            --data @/tmp/payload.json)
 
-          echo ""
-          echo "✅ Registration complete"
+          # Extract HTTP status code and body
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+
+          echo "HTTP Status: $http_code"
+          echo "Registration response: $body"
+
+          # Check if request was successful
+          if [ "$http_code" != "200" ]; then
+            echo "❌ Registration failed with HTTP $http_code"
+            echo "Response: $body"
+            exit 1
+          fi
+
+          # Parse response
+          agent_id=$(echo "$body" | jq -r '.agent_id')
+          deployment_id=$(echo "$body" | jq -r '.id')
+          status=$(echo "$body" | jq -r '.message')
+
+          # Validate extracted values
+          if [ "$agent_id" = "null" ] || [ -z "$agent_id" ]; then
+            echo "❌ Failed to extract agent_id from response"
+            exit 1
+          fi
+
+          if [ "$deployment_id" = "null" ] || [ -z "$deployment_id" ]; then
+            echo "❌ Failed to extract deployment_id from response"
+            exit 1
+          fi
+
+          echo "agent_id=$agent_id" >> $GITHUB_OUTPUT
+          echo "deployment_id=$deployment_id" >> $GITHUB_OUTPUT
+          echo "✅ Registration successful: $status"
+          echo "📦 Agent ID: $agent_id"
+          echo "🚀 Deployment ID: $deployment_id"
+
+      - name: Wait for deployment to complete
+        run: |
+          agent_id=${{ steps.register.outputs.agent_id }}
+          deployment_id=${{ steps.register.outputs.deployment_id }}
+
+          echo "🚀 Waiting for Argo deployment to complete..."
+          echo "Agent ID: $agent_id"
+          echo "Deployment ID: $deployment_id"
+
+          max_attempts=60  # 10 minutes (60 * 10 seconds)
+          attempt=0
+
+          while [ $attempt -lt $max_attempts ]; do
+            status_response=$(curl -s -w "\n%{http_code}" "https://bindus.getbindu.com/agents/$agent_id/deployment/$deployment_id/status")
+
+            http_code=$(echo "$status_response" | tail -n1)
+            body=$(echo "$status_response" | sed '$d')
+
+            if [ "$http_code" != "200" ]; then
+              echo "⚠️  Status check failed with HTTP $http_code (attempt $((attempt + 1))/$max_attempts)"
+              echo "Response: $body"
+              sleep 10
+              attempt=$((attempt + 1))
+              continue
+            fi
+
+            deployment_status=$(echo "$body" | jq -r '.status // .deployment_status // "unknown"')
+            echo "⏳ Deployment status: $deployment_status (attempt $((attempt + 1))/$max_attempts)"
+
+            if [ "$deployment_status" = "succeeded" ]; then
+              deployment_url=$(echo "$body" | jq -r '.deployment_url // "N/A"')
+              health_check_url=$(echo "$body" | jq -r '.health_check_url // "N/A"')
+              grafana_url=$(echo "$body" | jq -r '.grafana_dashboard_url // "N/A"')
+
+              echo "✅ Deployment succeeded!"
+              echo "🚀 Agent URL: $deployment_url"
+              echo "❤️  Health Check: $health_check_url"
+              echo "📊 Grafana Dashboard: $grafana_url"
+              exit 0
+            elif [ "$deployment_status" = "failed" ]; then
+              error=$(echo "$body" | jq -r '.deployment_error // .error // "Unknown error"')
+              echo "❌ Deployment failed: $error"
+              exit 1
+            fi
+
+            # Still deploying (pending or deploying status), wait and retry
+            sleep 10
+            attempt=$((attempt + 1))
+          done
+
+          echo "❌ Deployment timed out after 10 minutes"
+          echo "Last status: $deployment_status"
+          exit 1
